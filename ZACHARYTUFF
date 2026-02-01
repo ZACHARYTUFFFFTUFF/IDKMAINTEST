@@ -1,0 +1,146 @@
+-- ZACH LAGSWITCH UI
+-- Movable UI
+-- Button: OPEN⚙️
+-- On click:
+-- 1) UI turns red (borders + text)
+-- 2) Launching spaceship animation
+-- 3) UI disappears
+-- 4) Script executes
+
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+-- cleanup
+if PlayerGui:FindFirstChild("ZACH_LAGSWITCH") then
+	PlayerGui.ZACH_LAGSWITCH:Destroy()
+end
+
+-- ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ZACH_LAGSWITCH"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+-- Main frame
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 260, 0, 120)
+Main.Position = UDim2.new(0.5, -130, 0.45, 0)
+Main.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+Main.BorderSizePixel = 0
+Main.Parent = ScreenGui
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 14)
+Corner.Parent = Main
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(120, 120, 120)
+Stroke.Thickness = 3
+Stroke.Parent = Main
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundTransparency = 1
+Title.Text = "ZACH LAGSWITCH"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 22
+Title.TextColor3 = Color3.fromRGB(220, 220, 220)
+Title.Parent = Main
+
+-- Button
+local OpenBtn = Instance.new("TextButton")
+OpenBtn.Size = UDim2.new(0, 180, 0, 45)
+OpenBtn.Position = UDim2.new(0.5, -90, 0.58, 0)
+OpenBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+OpenBtn.Text = "OPEN⚙️"
+OpenBtn.Font = Enum.Font.GothamBold
+OpenBtn.TextSize = 20
+OpenBtn.TextColor3 = Color3.fromRGB(220, 220, 220)
+OpenBtn.AutoButtonColor = false
+OpenBtn.Parent = Main
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 10)
+BtnCorner.Parent = OpenBtn
+
+local BtnStroke = Instance.new("UIStroke")
+BtnStroke.Color = Color3.fromRGB(120, 120, 120)
+BtnStroke.Thickness = 2
+BtnStroke.Parent = OpenBtn
+
+-- Drag logic
+local dragging = false
+local dragStart
+local startPos
+
+Main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = Main.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
+	or input.UserInputType == Enum.UserInputType.Touch) then
+		local delta = input.Position - dragStart
+		Main.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- Launch animation + execute script
+OpenBtn.MouseButton1Click:Connect(function()
+	OpenBtn.Active = false
+
+	-- change to red theme
+	Stroke.Color = Color3.fromRGB(255, 0, 0)
+	BtnStroke.Color = Color3.fromRGB(255, 0, 0)
+	Title.TextColor3 = Color3.fromRGB(255, 0, 0)
+	OpenBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
+
+	-- spaceship launch animation
+	local launchTween = TweenService:Create(
+		Main,
+		TweenInfo.new(0.9, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+		{
+			Position = UDim2.new(Main.Position.X.Scale, Main.Position.X.Offset, -0.35, 0),
+			Rotation = 30,
+			Size = UDim2.new(0, 180, 0, 80)
+		}
+	)
+
+	local fadeTween = TweenService:Create(
+		Main,
+		TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out),
+		{
+			BackgroundTransparency = 1
+		}
+	)
+
+	launchTween:Play()
+	task.wait(0.3)
+	fadeTween:Play()
+
+	task.wait(0.9)
+	ScreenGui:Destroy()
+
+	loadstring(game:HttpGet(
+		"https://raw.githubusercontent.com/ZACHARYTUFFFFTUFF/ZACHARYTUFFFFTUFFLAGSWITCH/refs/heads/main/IDKLAGSWITCHBYZACHANDRIAN"
+	))()
+end)
